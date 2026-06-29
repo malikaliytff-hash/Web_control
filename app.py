@@ -4,13 +4,13 @@ import base64
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 
-# Set layout to wide for better site viewing
+# Wide layout configuration
 st.set_page_config(layout="wide")
 
-# CSS for the Inferno Theme
+# CSS stored in a safe variable to avoid SyntaxErrors
 CSS_STYLE = """
 <style>
-    body { background: #1a0000; color: #ff4500; font-family: 'Courier New', monospace; margin: 0; padding: 10px; }
+    body { background: #1a0000; color: #ff4500; font-family: 'Courier New', monospace; }
     .fire-box { border: 2px solid #ff4500; padding: 15px; box-shadow: 0 0 20px #ff0000; }
     input { width: 100%; box-sizing: border-box; background: #330000; color: #ffaa00; border: 1px solid #ff4500; padding: 10px; margin-top: 10px; }
     button { width: 100%; padding: 10px; background: #ff4500; border: none; margin-top: 10px; color: #000; font-weight: bold; }
@@ -20,7 +20,7 @@ CSS_STYLE = """
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
 st.subheader("🔥 INFERNO PROXY MANAGER")
 
-# Inputs
+# User Inputs
 target_url = st.text_input("Target URL")
 image_file = st.file_uploader("Upload Image", type=['png', 'jpg', 'jpeg'])
 
@@ -34,11 +34,8 @@ if st.button("EXECUTE INJECTION"):
 
             # 2. Asset & Link Rewriting
             for tag in soup.find_all(['link', 'script', 'img', 'a']):
-                # Force links to open in the same frame
                 if tag.name == 'a' and tag.has_attr('href'):
                     tag['target'] = '_self'
-                
-                # Convert relative paths to absolute
                 for attr in ['href', 'src']:
                     if tag.has_attr(attr):
                         tag[attr] = urljoin(base_url, tag[attr])
@@ -50,8 +47,15 @@ if st.button("EXECUTE INJECTION"):
             if soup.body:
                 soup.body.insert(0, BeautifulSoup(img_tag, 'html.parser'))
             
-            # 4. Full Rendering
-            st.components.v1.html(str(soup), height=1200, scrolling=True)
+            # 4. Save and Render
+            # We save the modified HTML to a file and point st.iframe to it
+            with open("output.html", "w", encoding="utf-8") as f:
+                f.write(str(soup))
+            
+            st.iframe("about:blank", height=1200) # Placeholder or local host serving
+            # Since Streamlit's iframe needs a URL, use a local server or 
+            # for raw HTML injection, use the below alternative:
+            st.markdown(str(soup), unsafe_allow_html=True)
             
         except Exception as e:
             st.error(f"Proxy Error: {str(e)}")
