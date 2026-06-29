@@ -7,7 +7,7 @@ from urllib.parse import urljoin, urlparse
 # Wide layout configuration
 st.set_page_config(layout="wide")
 
-# CSS stored in a safe string variable to prevent SyntaxErrors
+# CSS isolation to prevent SyntaxErrors
 CSS_STYLE = """
 <style>
     body { background: #1a0000; color: #ff4500; font-family: 'Courier New', monospace; }
@@ -20,7 +20,7 @@ CSS_STYLE = """
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
 st.subheader("🔥 INFERNO PROXY MANAGER")
 
-# User Inputs
+# Inputs
 target_url = st.text_input("Target URL")
 image_file = st.file_uploader("Upload Image", type=['png', 'jpg', 'jpeg'])
 
@@ -47,7 +47,8 @@ if st.button("EXECUTE INJECTION"):
             if soup.body:
                 soup.body.insert(0, BeautifulSoup(img_tag, 'html.parser'))
             
-            # 4. Rendering (Using compliant st.markdown)
+            # 4. Compliant Rendering (Replaced st.components.v1.html)
+            # Using markdown allows for raw HTML rendering without deprecated components
             st.markdown(str(soup), unsafe_allow_html=True)
             
         except Exception as e:
