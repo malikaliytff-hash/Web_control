@@ -7,7 +7,7 @@ from urllib.parse import urljoin, urlparse
 # Wide layout configuration
 st.set_page_config(layout="wide")
 
-# CSS stored in a safe variable to avoid SyntaxErrors
+# CSS stored in a safe string variable to prevent SyntaxErrors
 CSS_STYLE = """
 <style>
     body { background: #1a0000; color: #ff4500; font-family: 'Courier New', monospace; }
@@ -47,14 +47,7 @@ if st.button("EXECUTE INJECTION"):
             if soup.body:
                 soup.body.insert(0, BeautifulSoup(img_tag, 'html.parser'))
             
-            # 4. Save and Render
-            # We save the modified HTML to a file and point st.iframe to it
-            with open("output.html", "w", encoding="utf-8") as f:
-                f.write(str(soup))
-            
-            st.iframe("about:blank", height=1200) # Placeholder or local host serving
-            # Since Streamlit's iframe needs a URL, use a local server or 
-            # for raw HTML injection, use the below alternative:
+            # 4. Rendering (Using compliant st.markdown)
             st.markdown(str(soup), unsafe_allow_html=True)
             
         except Exception as e:
